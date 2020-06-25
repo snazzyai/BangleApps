@@ -174,8 +174,8 @@ let heartRate = 0;
 let gpsReady = false;
 let hrmReady = false;
 let tracking = false;
-//var dataArray = ["data:text/csv;charset=utf-8,",0,0,0,0,0,0,0,0,0];
-var dataArray = [];
+var dataArray = ["data:text/csv;charset=utf-8,"];
+//var dataArray = [];
 
 function formatClock(date) {
   return ('0' + date.getHours()).substr(-2) + ':' + ('0' + date.getMinutes()).substr(-2);
@@ -280,8 +280,9 @@ function storeData() {
 
 function storeInFile()  {
 	var csvContent = dataArray.join("\n");
-    //now = new Date();
-   // filename = "activity" + now.getTime()+ ".data"; //new file for each day
+    now = new Date();
+    filename = "activity" + now.getTime()+ ".data"; //new file for each day
+    s.open(filename,"a");
     s.write(filename,csvContent);
     dataFile = undefined; //save memory
   }
@@ -311,11 +312,7 @@ function handleStep() {
 
 function start() {
   tracking = true;
- //sats
-now = new Date();
-filename = "activity" + now.getTime()+ ".data";
-s.open(filename,"a");
-	
+ //sats	
   g.setFontAlign(-1, -1, 0);
   g.setColor(0x07E0);
   g.drawString('  Activity Started',2,10);
@@ -357,7 +354,7 @@ drawBackground();
 draw();
 
 setInterval(draw, 500);
-//timerStoreData = setInterval(storeData, storeDataInterval);
+timerStoreData = setInterval(storeData, storeDataInterval);
 
 setWatch(start, BTN1, { repeat: true });
 setWatch(stop, BTN3, { repeat: true });
