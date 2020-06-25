@@ -279,9 +279,9 @@ function storeData() {
 
 function storeInFile()  {
 	var csvContent = dataArray.join("\n");
-    now = new Date();
-    filename = "activity" + now.getTime()+ ".data"; //new file for each day
-    s.writeJSON(filename,csvContent);
+    //now = new Date();
+   // filename = "activity" + now.getTime()+ ".data"; //new file for each day
+    s.write(filename,csvContent);
     dataFile = undefined; //save memory
   }
 /*sats end*/
@@ -311,6 +311,10 @@ function handleStep() {
 function start() {
   tracking = true;
  //sats
+now = new Date();
+filename = "activity" + now.getTime()+ ".data";
+s.open(filename,"a");
+	
   g.setFontAlign(-1, -1, 0);
   g.setColor(0x07E0);
   g.drawString('  Activity Started',2,10);
