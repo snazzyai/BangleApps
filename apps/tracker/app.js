@@ -174,7 +174,8 @@ let heartRate = 0;
 let gpsReady = false;
 let hrmReady = false;
 let tracking = false;
-var dataArray = ["data:text/csv;charset=utf-8,",0,0,0,0,0,0,0,0,0];
+//var dataArray = ["data:text/csv;charset=utf-8,",0,0,0,0,0,0,0,0,0];
+var dataArray = [];
 
 function formatClock(date) {
   return ('0' + date.getHours()).substr(-2) + ':' + ('0' + date.getMinutes()).substr(-2);
@@ -356,7 +357,7 @@ drawBackground();
 draw();
 
 setInterval(draw, 500);
-timerStoreData = setInterval(storeData, storeDataInterval);
+//timerStoreData = setInterval(storeData, storeDataInterval);
 
 setWatch(start, BTN1, { repeat: true });
 setWatch(stop, BTN3, { repeat: true });
