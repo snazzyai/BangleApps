@@ -65,7 +65,7 @@ class IqrFilter {
     if (this._buffer.length === this._size) {
       result = false;
       for (const key of Object.keys(point)) {
-        const data = this._buffer.map(item => item[key]);
+        const data = this._buffer.map((item) => item[key]);
         data.sort((a, b) => (a - b) / Math.abs(a - b));
         const q1 = data[this._i1];
         const q3 = data[this._i3];
@@ -155,13 +155,14 @@ class Step {
     this._buffer.push(Date.now() / 1000);
     this._buffer = this._buffer.slice(-this._size);
     const interval = this._buffer[this._buffer.length - 1] - this._buffer[0];
-    return interval ? Math.round(60 * (this._buffer.length - 1) / interval) : 0;
+    return interval
+      ? Math.round((60 * (this._buffer.length - 1)) / interval)
+      : 0;
   }
 }
 
 const gps = new Gps();
 const step = new Step(10);
-const s = require('Storage'); //sats
 
 let totDist = 0;
 let totTime = 0;
@@ -173,12 +174,18 @@ let heartRate = 0;
 
 let gpsReady = false;
 let hrmReady = false;
-let tracking = false;
-var dataArray = ["data:text/csv;charset=utf-8,"];
-//var dataArray = [];
+let running = false;
+
+let canPressTwo = false;
+
+let dataArray = ['data:text/csv;charset=utf-8'];
 
 function formatClock(date) {
-  return ('0' + date.getHours()).substr(-2) + ':' + ('0' + date.getMinutes()).substr(-2);
+  return (
+    ('0' + date.getHours()).substr(-2) +
+    ':' +
+    ('0' + date.getMinutes()).substr(-2)
+  );
 }
 
 function formatDistance(m) {
@@ -189,7 +196,12 @@ function formatTime(s) {
   const hrs = Math.floor(s / 3600);
   const min = Math.floor(s / 60) % 60;
   const sec = Math.floor(s % 60);
-  return (hrs ? hrs + ':' : '') + ('0' + min).substr(-2) + `:` + ('0' + sec).substr(-2);
+  return (
+    (hrs ? hrs + ':' : '') +
+    ('0' + min).substr(-2) +
+    `:` +
+    ('0' + sec).substr(-2)
+  );
 }
 
 function formatSpeed(kmh) {
@@ -203,10 +215,10 @@ function formatSpeed(kmh) {
 }
 
 function drawBackground() {
-  g.setColor(tracking ? 0x00E0 : 0x0000);
+  g.setColor(running ? 0x00e0 : 0x0000);
   g.fillRect(0, 30, 240, 240);
 
-  g.setColor(0xFFFF);
+  g.setColor(0xffff);
   g.setFontAlign(0, -1, 0);
   g.setFont('6x8', 2);
 
@@ -221,10 +233,10 @@ function drawBackground() {
 }
 
 function draw() {
-  const totSpeed = totTime ? 3.6 * totDist / totTime : 0;
-  const totCadence = totTime ? Math.round(60 * totSteps / totTime) : 0;
+  const totSpeed = totTime ? (3.6 * totDist) / totTime : 0;
+  const totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
 
-  g.setColor(tracking ? 0x00E0 : 0x0000);
+  g.setColor(running ? 0x00e0 : 0x0000);
   g.fillRect(0, 30, 240, 50);
   g.fillRect(0, 70, 240, 100);
   g.fillRect(0, 120, 240, 150);
@@ -234,11 +246,11 @@ function draw() {
   g.setFont('6x8', 2);
 
   g.setFontAlign(-1, -1, 0);
-  g.setColor(gpsReady ? 0x07E0 : 0xF800);
+  g.setColor(gpsReady ? 0x07e0 : 0xf800);
   g.drawString(' GPS', 6, 30);
 
   g.setFontAlign(1, -1, 0);
-  g.setColor(0xFFFF);
+  g.setColor(0xffff);
   g.drawString(formatClock(new Date()), 234, 30);
 
   g.setFontAlign(0, -1, 0);
@@ -252,47 +264,18 @@ function draw() {
   g.setFont('6x8', 2);
   g.drawString(formatSpeed(speed), 40, 220);
 
-  g.setColor(hrmReady ? 0x07E0 : 0xF800);
+  g.setColor(hrmReady ? 0x07e0 : 0xf800);
   g.drawString(heartRate, 120, 220);
 
-  g.setColor(0xFFFF);
+  g.setColor(0xffff);
   g.drawString(cadence, 200, 220);
 }
-
-/*sats*/
-function storeData() {
-	const totSpeed = totTime ? 3.6 * totDist / totTime : 0;
-	const totCadence = totTime ? Math.round(60 * totSteps / totTime) : 0;
-	now = new Date();
-
-	var infoArray = [now.getTime(),
-        formatDistance(totDist),
-        formatTime(totTime),
-        formatSpeed(totSpeed),
-		totSteps,
-		totCadence,
-        totSpeed,
-		heartRate,
-		cadence];
-	dataArray.push(infoArray.join(","));
-	}
-
-
-function storeInFile()  {
-	var csvContent = dataArray.join("\n");
-    now = new Date();
-    filename = "activity" + now.getTime()+ ".data"; //new file for each day
-    s.open(filename,"a");
-    s.write(filename,csvContent);
-    dataFile = undefined; //save memory
-  }
-/*sats end*/
 
 function handleGps(coords) {
   const step = gps.getDistance(coords);
   gpsReady = coords.fix > 0 && gps.isReady();
   speed = isFinite(gps.speed) ? gps.speed : 0;
-  if (tracking) {
+  if (running) {
     totDist += step.d;
     totTime += step.t;
   }
@@ -305,39 +288,78 @@ function handleHrm(hrm) {
 
 function handleStep() {
   cadence = step.getCadence();
-  if (tracking) {
+  if (running) {
     totSteps += 1;
   }
 }
 
-function start() {
-  tracking = true;
- //sats	
+function storeData() {
+  const totSpeed = totTime ? (3.6 * totDist) / totTime : 0;
+  const totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
+  var now = new Date();
+  var infoArray = [
+    now.getTime(),
+    totSteps,
+    totCadence,
+    totSpeed,
+    heartRate,
+    cadence,
+  ];
+  dataArray.push(infoArray.join(','));
+}
+
+function storeInFile() {
+  if (canPressTwo) {
+    console.log('stored in file');
+    var csvContent = dataArray.join('\n');
+    now = new Date();
+    var file = require('Storage');
+    console.log(now);
+    var filename =
+      Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
+    console.log('filename', filename); //new file for each day
+    file.open(filename, 'w').write(csvContent);
+    canPressTwo = false;
+  } else {
+    return false;
+  }
+}
+
+function drawActivityStarted() {
   g.setFontAlign(-1, -1, 0);
-  g.setColor(0x07E0);
-  g.drawString('  Activity Started',2,10);
+  g.setColor(0x07e0);
+  g.drawString('  Activity Started', 2, 10);
+  canPressTwo = true;
+}
+
+function drawActivityStopped() {
+  if (canPressTwo) {
+    g.setFontAlign(-1, -1, 0);
+    g.setColor(250, 0, 0);
+    g.drawString('  Activity Stopped', 2, 10);
+  }
+}
+
+function start() {
+  running = true;
   drawBackground();
   draw();
+  drawActivityStarted();
 }
 
 function stop() {
-  if (!tracking) {
+  if (!running) {
     totDist = 0;
     totTime = 0;
     totSteps = 0;
   }
-  tracking = false;
-  //sats
-  g.setFontAlign(-1, -1, 0);
-  g.setColor(0xF800);
-  g.drawString('  Activity Stopped',2,10);
-  storeInFile(); //sats
+  running = false;
   drawBackground();
   draw();
+  drawActivityStopped();
+  pressButtonTwo = true;
+  storeInFile();
 }
-/*sats*/
-var timerStoreData = 0;
-var storeDataInterval = 5*1000; //ms
 
 Bangle.on('GPS', handleGps);
 Bangle.on('HRM', handleHrm);
@@ -347,14 +369,13 @@ Bangle.setGPSPower(1);
 Bangle.setHRMPower(1);
 
 g.clear();
-s.eraseAll(); //sats - clear all files
 Bangle.loadWidgets();
 Bangle.drawWidgets();
 drawBackground();
 draw();
 
 setInterval(draw, 500);
-timerStoreData = setInterval(storeData, storeDataInterval);
+setInterval(storeData, 5000);
 
 setWatch(start, BTN1, { repeat: true });
 setWatch(stop, BTN3, { repeat: true });
