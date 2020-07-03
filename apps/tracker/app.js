@@ -167,6 +167,7 @@ const step = new Step(10);
 let totDist = 0;
 let totTime = 0;
 let totSteps = 0;
+let totCadence = 0;
 
 let speed = 0;
 let cadence = 0;
@@ -177,6 +178,7 @@ let hrmReady = false;
 let running = false;
 
 let canPressTwo = false;
+let activity = 'null';
 
 let dataArray = ['data:text/csv;charset=utf-8'];
 
@@ -234,7 +236,7 @@ function drawBackground() {
 
 function draw() {
   const totSpeed = totTime ? (3.6 * totDist) / totTime : 0;
-  const totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
+  totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
 
   g.setColor(running ? 0x00e0 : 0x0000);
   g.fillRect(0, 30, 240, 50);
@@ -295,7 +297,7 @@ function handleStep() {
 
 function storeData() {
   const totSpeed = totTime ? (3.6 * totDist) / totTime : 0;
-  const totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
+  totCadence = totTime ? Math.round((60 * totSteps) / totTime) : 0;
   var now = new Date();
   var infoArray = [
     now.getTime(),
@@ -315,16 +317,27 @@ function storeInFile() {
     now = new Date();
     var file = require('Storage');
     console.log(now);
-    var filename =
-      Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
+    var filename = activity;
+      //Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
     console.log('filename', filename); //new file for each day
-    file.open(filename, 'w').write(csvContent);
+    file.open(filename, 'w').write(activity.concat("\n"));
+    file.open(filename, 'a').write(csvContent);
     canPressTwo = false;
   } else {
     return false;
   }
 }
 
+function detectActivity() {
+  if(totCadence > 0) {
+    if(totCadence <= 130 ) {
+      activity = 'walking';
+    } else {
+      activity = 'running';
+   }
+  }
+}
+      
 function drawActivityStarted() {
   g.setFontAlign(-1, -1, 0);
   g.setColor(0x07e0);
@@ -354,6 +367,7 @@ function stop() {
     totSteps = 0;
   }
   running = false;
+  detectActivity();
   drawBackground();
   draw();
   drawActivityStopped();
