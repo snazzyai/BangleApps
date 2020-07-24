@@ -178,7 +178,7 @@ let hrmReady = false;
 let running = false;
 
 let canPressTwo = false;
-let activity = 'null';
+let activity = null;
 
 let dataArray = ['data:text/csv;charset=utf-8'];
 
@@ -320,7 +320,8 @@ function storeInFile() {
     var filename = activity;
       //Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
     console.log('filename', filename); //new file for each day
-    file.open(filename, 'w').write(activity.concat("\n"));
+    file.open(filename, 'w').write(activity);
+    file.open(filename, 'a').write("\n");
     file.open(filename, 'a').write(csvContent);
     canPressTwo = false;
   } else {
