@@ -180,7 +180,7 @@ let running = false;
 let canPressTwo = false;
 let activity = null;
 
-let dataArray = ['data:text/csv;charset=utf-8'];
+let dataArray = [];
 
 function formatClock(date) {
   return (
@@ -313,16 +313,17 @@ function storeData() {
 function storeInFile() {
   if (canPressTwo) {
     console.log('stored in file');
-    var csvContent = dataArray.join('\n');
+    //var csvContent = dataArray.join('\n');
+    dataArray.push(activity);
     now = new Date();
+    var filename = 'track.d';
     var file = require('Storage');
     console.log(now);
-    var filename = activity;
       //Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
     console.log('filename', filename); //new file for each day
-    file.open(filename, 'w').writeJSON(activity);
-    file.open(filename, 'a').writeJSON("\n");
-    file.open(filename, 'a').writeJSON(csvContent);
+    
+    //file.writeJSON(filename,activity);
+    file.writeJSON(filename,dataArray);
     canPressTwo = false;
   } else {
     return false;
@@ -338,7 +339,7 @@ function detectActivity() {
    }
   }
 }
-      
+
 function drawActivityStarted() {
   g.setFontAlign(-1, -1, 0);
   g.setColor(0x07e0);
