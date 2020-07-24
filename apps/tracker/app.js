@@ -320,9 +320,9 @@ function storeInFile() {
     var filename = activity;
       //Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
     console.log('filename', filename); //new file for each day
-    file.open(filename, 'w').write(activity);
-    file.open(filename, 'a').write("\n");
-    file.open(filename, 'a').write(csvContent);
+    file.open(filename, 'w').writeJSON(activity);
+    file.open(filename, 'a').writeJSON("\n");
+    file.open(filename, 'a').writeJSON(csvContent);
     canPressTwo = false;
   } else {
     return false;
