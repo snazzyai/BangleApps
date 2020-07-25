@@ -172,6 +172,11 @@ let totCadence = 0;
 let speed = 0;
 let cadence = 0;
 let heartRate = 0;
+//sats
+let avgHeartRate = 0;
+let totHr = 0;
+let avgPace = 0;
+let finalData = {};
 
 let gpsReady = false;
 let hrmReady = false;
@@ -340,6 +345,12 @@ function detectActivity() {
   }
 }
 
+function storeFinalActivityData() {
+  var avgHr = (totHr/totTime)*60;
+  avgPace = totTime/totDist;
+  finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence};
+}
+
 function drawActivityStarted() {
   g.setFontAlign(-1, -1, 0);
   g.setColor(0x07e0);
@@ -374,6 +385,7 @@ function stop() {
   draw();
   drawActivityStopped();
   pressButtonTwo = true;
+  storeFinalActivityData();
   storeInFile();
 }
 
