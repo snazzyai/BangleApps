@@ -173,8 +173,9 @@ let speed = 0;
 let cadence = 0;
 let heartRate = 0;
 //sats
+let maxHR;
+let minHR;
 let avgHeartRate = 0;
-let totHr = 0;
 let avgPace = 0;
 let finalData = {};
 
@@ -292,6 +293,7 @@ function handleGps(coords) {
 function handleHrm(hrm) {
   hrmReady = hrm.confidence > 50;
   heartRate = hrm.bpm;
+  averageHR();
 }
 
 function handleStep() {
@@ -327,7 +329,6 @@ function storeInFile() {
     console.log(now);
       //Math.ceil(Math.random() * 1000).toString() + now.getTime().toString();
     console.log('filename', filename); //new file for each day
-    
     //file.writeJSON(filename,activity);
     file.writeJSON(filename,dataArray);
     canPressTwo = false;
@@ -346,9 +347,20 @@ function detectActivity() {
   }
 }
 
+function averageHR () {
+  maxHR = 0;
+  minHR = 0;
+  if(heartRate > maxHR){
+    maxHR = heartRate;
+  }
+  if(heartRate < maxHR){
+    minHR = heartRate;
+  }
+}
+
 function storeFinalActivityData() {
-  var avgHr = (totHr/totTime)*60;
-  avgPace = totTime/totDist;
+  avgHr = heartRate === 0 ? 0 : (maxHR+minHR)/2;
+  avgPace = totTime === 0 || totDist === 0 ? 0 : totTime/totDist;
   activityType = totCadence <= 130 ? 'Walking':'Running';
   finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence, activity: activityType};
   finalDataString = JSON.stringify(finalData);
