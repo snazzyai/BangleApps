@@ -186,6 +186,7 @@ let canPressTwo = false;
 let activity = null;
 
 let dataArray = [];
+let finalDataString = '';
 
 function formatClock(date) {
   return (
@@ -349,6 +350,7 @@ function storeFinalActivityData() {
   var avgHr = (totHr/totTime)*60;
   avgPace = totTime/totDist;
   finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence};
+  finalDataString = JSON.stringify(finalData);
 }
 
 function drawActivityStarted() {
