@@ -373,6 +373,18 @@ function start() {
   drawActivityStarted();
 }
 
+
+function sendData(){
+NRF.setServices({
+  0xBCDE : {
+    0xABCD : {
+      readable: true,
+      value: finalDataString
+  }
+}
+});
+}
+
 function stop() {
   if (!running) {
     totDist = 0;
@@ -407,3 +419,4 @@ setInterval(storeData, 5000);
 
 setWatch(start, BTN1, { repeat: true });
 setWatch(stop, BTN3, { repeat: true });
+setWatch(sendData, BTN2, {repeat: true});
