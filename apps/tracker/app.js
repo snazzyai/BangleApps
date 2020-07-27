@@ -349,7 +349,8 @@ function detectActivity() {
 function storeFinalActivityData() {
   var avgHr = (totHr/totTime)*60;
   avgPace = totTime/totDist;
-  finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence};
+  activityType = totCadence <= 130 ? 'Walking':'Running';
+  finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence, activity: activityType};
   finalDataString = JSON.stringify(finalData);
 }
 
@@ -373,6 +374,7 @@ function start() {
   drawBackground();
   draw();
   drawActivityStarted();
+  setInterval(storeData, 5000);
 }
 
 
@@ -401,6 +403,7 @@ function stop() {
   pressButtonTwo = true;
   storeFinalActivityData();
   storeInFile();
+  clearInterval(storeData);
 }
 
 Bangle.on('GPS', handleGps);
@@ -417,7 +420,7 @@ drawBackground();
 draw();
 
 setInterval(draw, 500);
-setInterval(storeData, 5000);
+
 
 setWatch(start, BTN1, { repeat: true });
 setWatch(stop, BTN3, { repeat: true });
