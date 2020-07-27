@@ -361,7 +361,7 @@ function averageHR () {
 function storeFinalActivityData() {
   avgHr = heartRate === 0 ? 0 : (maxHR+minHR)/2;
   avgPace = totTime === 0 || totDist === 0 ? 0 : totTime/totDist;
-  activityType = totCadence <= 130 ? 'Walking':'Running';
+  let activityType = totCadence <= 130 ? 'Walking':'Running';
   finalData = {steps: totSteps, time: totTime, distance:totDist, AverageHR: avgHr, Pace: avgPace,cadence: totCadence, activity: activityType};
   finalDataString = JSON.stringify(finalData);
 }
